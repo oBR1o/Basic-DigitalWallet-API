@@ -31,6 +31,8 @@ class DBItem(Item, SQLModel, table=True):
 
 
 class ItemList(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     items: list[Item]
     page: int
     page_size: int
@@ -112,3 +114,33 @@ async def delete_item(item_id: int) -> dict:
         session.delete(db_item)
         session.commit()
     return dict(message=f"delete success")
+
+
+class BaseMerchant(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    name: str
+    description: str | None = None
+    telephone: str | None = None
+    email: str | None = None
+    age: int | None = None
+
+class CreatedMerchant(BaseMerchant):
+    pass
+
+class UpdatedMerchant(BaseMerchant):
+    pass
+
+
+class Merchant(BaseMerchant):
+    id: int
+
+
+class MarchantList(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    merchants: list[Merchant]
+    page: int
+    page_size: int
+    size_per_page: int
+
