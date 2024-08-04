@@ -32,7 +32,7 @@ class DBItem(Item, SQLModel, table=True):
 
 class ItemList(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    
+
     items: list[Item]
     page: int
     page_size: int
@@ -144,3 +144,49 @@ class MarchantList(BaseModel):
     page_size: int
     size_per_page: int
 
+class DBMerchant(Merchant, SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+@app.post("/merchants")
+async def create_merchant(item: CreatedMerchant)-> Merchant:
+    data = item.dict()
+    db_merchant = DBMerchant(**data)
+    with Session(engine) as session:
+        session.add(db_merchant)
+        session.commit()
+        session.refresh(db_merchant)
+
+    return Merchant.from_orm(db_merchant)
+
+@app.get("/merchants")
+async def read_merchants() -> MarchantList:
+    with Session(engine) as session:
+        merchants = session.exec(select(DBMerchant)).all()
+    return MarchantList.from_orm(dict(merchants=merchants, page_size=0, page=0, size_per_page=0))
+
+@app.get("/merchants/{merchant_id}")
+async def read_merchant(merchant_id: int) -> Merchant:
+    with Session(engine) as session:
+        db_merchant = session.get(DBMerchant, merchant_id)
+        if db_merchant:
+            return Merchant.from_orm(db_merchant)
+    raise HTTPException(status_code=404, detail="Merchant not found")
+
+@app.put("/merchants/{merchant_id}")
+async def update_merchant(merchant_id: int, merchant: UpdatedMerchant) -> Merchant:
+    data = merchant.dict()
+    with Session(engine) as session:
+        db_merchant = session.get(DBMerchant, merchant_id)
+        db_merchant.sqlmodel_update(data)
+        session.add(db_merchant)
+        session.commit()
+        session.refresh(db_merchant)
+    return Merchant.from_orm(db_merchant)
+
+@app.delete("/merchants/{merchant_id}")
+async def delete_merchant(merchant_id: int) -> dict:
+    with Session(engine) as session:
+        db_merchant = session.get(DBMerchant, merchant_id)
+        session.delete(db_merchant)
+        session.commit()
+    return dict(message=f"delete success")
