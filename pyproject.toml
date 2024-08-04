@@ -2,7 +2,7 @@
 name = "digimon"
 version = "0.1.0"
 description = ""
-authors = ["Thanathip Limna <boatkrap@gmail.com>"]
+authors = ["Natthawut Suksai <owen55660@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
