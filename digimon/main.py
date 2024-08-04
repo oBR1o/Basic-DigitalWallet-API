@@ -159,10 +159,10 @@ async def create_merchant(item: CreatedMerchant)-> Merchant:
     return Merchant.from_orm(db_merchant)
 
 @app.get("/merchants")
-async def read_merchants() -> MarchantList:
+async def read_merchants(page: int = 1, page_size: int = 10) -> MarchantList:
     with Session(engine) as session:
-        merchants = session.exec(select(DBMerchant)).all()
-    return MarchantList.from_orm(dict(merchants=merchants, page_size=0, page=0, size_per_page=0))
+        merchants = session.exec(select(DBMerchant).offset((page - 1) * page_size).limit(page_size)).all()
+    return MarchantList.from_orm(dict(merchants=merchants, page_size= page_size, page= page, size_per_page= len(merchants)))
 
 @app.get("/merchants/{merchant_id}")
 async def read_merchant(merchant_id: int) -> Merchant:
@@ -190,3 +190,29 @@ async def delete_merchant(merchant_id: int) -> dict:
         session.delete(db_merchant)
         session.commit()
     return dict(message=f"delete success")
+
+
+class BaseTransaction(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    total_price = float
+    quantity: int = 1
+
+class CreatedTransaction(BaseTransaction):
+    pass
+
+class UpdatedTransaction(BaseTransaction):
+    pass
+
+class Transaction(BaseTransaction):
+    id: int
+
+class TransactionList(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    transactions: list[Transaction]
+    page: int
+    page_size: int
+    size_per_page: int
+
+
