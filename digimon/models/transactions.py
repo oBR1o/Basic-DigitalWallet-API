@@ -25,8 +25,11 @@ class Transaction(BaseTransaction):
 
 class DBTransaction(Transaction, SQLModel, table=True):
     __tablename__ = "transactions"
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int = Field(default=None, primary_key=True)
 
+    wallet_id: int = Field(default=None, foreign_key="wallets.id")
+
+    item_id: int = Field(default=None, foreign_key="items.id")
 
 class TransactionList(BaseModel):
     model_config = ConfigDict(from_attributes=True)
