@@ -11,6 +11,7 @@ class BaseItem(BaseModel):
     description: str | None = None
     price: float = 0.12
     tax: float | None = None
+    merchant_id: int | None
 
 
 class CreatedItem(BaseItem):
@@ -22,10 +23,13 @@ class UpdatedItem(BaseItem):
 
 class Item(BaseItem):
     id: int
+    merchant_id: int
 
 
 class DBItem(Item, SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    __tablename__ = "items"
+    id: int = Field(default=None, primary_key=True)
+    merchant_id: int = Field(default=None, foreign_key="merchants.id")
 
 
 class ItemList(BaseModel):

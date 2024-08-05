@@ -27,13 +27,14 @@ class Merchant(BaseMerchant):
 
 
 class DBMerchant(Merchant, SQLModel, table=True):
+    __tablename__ = "merchants"
     id: Optional[int] = Field(default=None, primary_key=True)
 
 
 class MerchantList(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    merchants: list[Merchant]
+    items: list[Merchant]
     page: int
     page_size: int
     size_per_page: int

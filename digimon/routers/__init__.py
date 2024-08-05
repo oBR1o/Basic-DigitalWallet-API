@@ -1,5 +1,7 @@
-from . import items, merchants
+from . import items
+from . import merchants
+
 
 def init_router(app):
     app.include_router(items.router)
-    app.inclide_router(merchants.router)
+    app.include_router(merchants.router)
