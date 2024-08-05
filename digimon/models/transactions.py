@@ -34,7 +34,7 @@ class DBTransaction(Transaction, SQLModel, table=True):
 class TransactionList(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    trainsactions: list[Transaction]
+    transactions: list[Transaction]
     page: int
     page_size: int
     size_per_page: int
