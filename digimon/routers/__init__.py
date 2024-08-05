@@ -1,4 +1,4 @@
-from . import router_items
+from . import items
 
 def init_router(app):
-    app.include_router(router_items.router)
+    app.include_router(items.router)
