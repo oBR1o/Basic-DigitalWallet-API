@@ -30,9 +30,9 @@ async def create_merchant(merchant: CreatedMerchant) -> Merchant:
 
 
 @router.get("")
-async def read_merchants() -> MerchantList:
+async def read_merchants(page: int = 1, page_size: int = 10) -> MerchantList:
     with Session(engine) as session:
-        merchants = session.exec(select(DBMerchant)).all()
+        merchants = session.exec(select(DBMerchant).offset((page - 1) * page_size).limit(page_size)).all()
     return MerchantList.from_orm(dict(merchants=merchants, page_size=0, page=0, size_per_page=0))
 
 
