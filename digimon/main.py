@@ -1,14 +1,7 @@
-from fastapi import FastAPI,  HTTPException
+from fastapi import FastAPI
 
 from .routers import init_router
 from .models import init_db
-
-from typing import Optional
-
-from pydantic import BaseModel, ConfigDict
-from sqlmodel import Field, SQLModel, create_engine, Session, select
-
-
 
 def create_app():
         app = FastAPI()
