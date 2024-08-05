@@ -66,7 +66,7 @@ async def read_transaction(transaction_id: int) -> Transaction:
         db_transaction = session.get(DBTransaction, transaction_id)
         if db_transaction:
             return Transaction.from_orm(db_transaction)
-    raise HTTPException(status_code=404, detail="Merchant not found")
+    raise HTTPException(status_code=404, detail="Transaction not found")
 
 
 @router.put("/{transaction_id}")
