@@ -12,10 +12,10 @@ class BaseTransaction(BaseModel):
 
 
 
-class CreatedMerchant(BaseTransaction):
+class CreatedTransaction(BaseTransaction):
     pass
 
-class UpdatedMerchant(BaseTransaction):
+class UpdatedTransaction(BaseTransaction):
     pass
 
 

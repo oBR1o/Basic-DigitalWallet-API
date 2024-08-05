@@ -14,7 +14,7 @@ from ..models import (
     engine,
 )
 
-router = APIRouter(prefix="/merchants")
+router = APIRouter(prefix="/merchants", tags=["merchant"])
 
 @router.post("")
 async def create_merchant(merchant: CreatedMerchant) -> Merchant:
