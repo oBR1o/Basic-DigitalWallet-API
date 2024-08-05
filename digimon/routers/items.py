@@ -7,7 +7,7 @@ from sqlmodel import Field, SQLModel, create_engine, Session, select
 
 from ..models import CreatedItem, UpdatedItem, Item, DBItem, ItemList, engine
 
-router = APIRouter(prefix="/items")
+router = APIRouter(prefix="/items", tags=["item"])
 
 @router.post("")
 async def create_item(item: CreatedItem) -> Item:

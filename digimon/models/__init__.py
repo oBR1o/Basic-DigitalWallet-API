@@ -1,8 +1,10 @@
-from typing import Optional
+from sqlmodel import SQLModel, create_engine, Session
 
-from sqlmodel import Field, SQLModel, create_engine, Session, select
+from . import merchants
 from . import items
+
 from .items import *
+from .merchants import *
 
 
 connect_args = {}
@@ -12,6 +14,7 @@ engine = create_engine(
     echo=True,
     connect_args=connect_args,
 )
+
 
 def init_db():
     SQLModel.metadata.create_all(engine)
