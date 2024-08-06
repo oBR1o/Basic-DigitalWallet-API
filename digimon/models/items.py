@@ -3,6 +3,8 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 
+from . import merchants
+
 
 class BaseItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
