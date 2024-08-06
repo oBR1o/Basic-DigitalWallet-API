@@ -25,7 +25,7 @@ async def create_item(
 
 @router.get("")
 async def read_items(
-    session: Annotated[AsyncSession, Depends(models.async_session)],
+    session: Annotated[AsyncSession, Depends(models.get_session)],
 ) -> models.ItemList:
     result = await session.exec(select(models.DBItem))
     items = result.all()
