@@ -6,13 +6,15 @@ from sqlmodel import Field, SQLModel, create_engine, Session, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .. import models
+from .. import security
 
 router = APIRouter(prefix="/items", tags=["item"])
 
 @router.post("")
 async def create_item(
     item: models.CreatedItem,
-    session: Annotated[AsyncSession, Depends(models.get_session)]   
+    session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],   
 ) -> models.Item | None:
     data = item.dict()
     dbitem = models.DBItem(**data)
@@ -51,6 +53,7 @@ async def read_item(
 async def update_item(
     item_id: int, item: models.UpdatedItem,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.Item:
     print("updated_item", item)
     data = item.dict()
@@ -66,7 +69,8 @@ async def update_item(
 @router.delete("/{item_id}")
 async def delete_item(
      item_id: int, 
-     session: Annotated[AsyncSession, Depends(models.get_session)]
+     session: Annotated[AsyncSession, Depends(models.get_session)],
+     current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
      ) -> dict:
     db_item = await session.get(models.DBItem, item_id)
     await session.delete(db_item)

@@ -5,6 +5,7 @@ from typing import Optional, Annotated
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from .. import security
 from .. import models
 
 router = APIRouter(prefix="/wallets", tags=["wallet"])
@@ -14,6 +15,7 @@ async def create_wallet(
     wallet: models.CreatedWallet, 
     merchant_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.Wallet:
     print("created_wallet", wallet)
     data = wallet.dict()
@@ -31,6 +33,7 @@ async def create_wallet(
 async def read_wallet(
     wallet_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.Wallet:
     db_wallet = await session.get(models.DBWallet, wallet_id)
     if db_wallet:
@@ -43,6 +46,7 @@ async def update_wallet(
     wallet_id: int, 
     wallet: models.UpdatedWallet,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.Wallet:
     print("updated_wallet", wallet)
     db_wallet = await session.get(models.DBWallet, wallet_id)
@@ -63,6 +67,7 @@ async def update_wallet(
 async def delete_merchant(
     merchant_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> dict:
     db_wallet = await session.get(models.DBWallet, merchant_id)
     await session.delete(db_wallet)

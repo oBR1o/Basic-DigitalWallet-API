@@ -5,6 +5,8 @@ from typing import Optional, Annotated
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 from sqlmodel.ext.asyncio.session import AsyncSession   
 
+from .. import security
+
 from .. import models
 
 
@@ -16,6 +18,7 @@ async def create_transaction(
     wallet_id: int, 
     item_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.Transaction:
     print("created_merchant", transaction)
     data = transaction.dict()
@@ -48,6 +51,7 @@ async def create_transaction(
 async def read_transactions(
     wallet_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.TransactionList:
     transactions = await session.exec(
         select(models.DBTransaction).where(models.DBTransaction.wallet_id == wallet_id)
@@ -65,6 +69,7 @@ async def read_transactions(
 async def read_transaction(
     transaction_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.Transaction:
     db_transaction = await session.get(models.DBTransaction, transaction_id)
     if db_transaction:
@@ -77,6 +82,7 @@ async def update_transaction(
     transaction_id: int, 
     transaction: models.UpdatedTransaction,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.Transaction:
     print("updated_transaction", transaction)
     data = transaction.dict()
@@ -93,6 +99,7 @@ async def update_transaction(
 async def delete_transaction(
     transaction_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> dict:
     db_transaction = await session.get(models.DBTransaction, transaction_id)
     await session.delete(db_transaction)
