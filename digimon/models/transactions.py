@@ -9,6 +9,8 @@ class BaseTransaction(BaseModel):
 
     total_price: float
     quantity: int
+    user_id: int | None = 0
+
 
 
 

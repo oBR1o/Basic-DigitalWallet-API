@@ -8,7 +8,7 @@ class BaseWallet(BaseModel):
 
     merchant_name: str | None = None
     balance: float = 0.0
-
+    user_id: int | None = 0
 
 class CreatedWallet(BaseWallet):
     pass
