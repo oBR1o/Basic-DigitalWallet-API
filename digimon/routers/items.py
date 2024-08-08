@@ -2,13 +2,17 @@ from fastapi import APIRouter,  HTTPException, Depends
 
 from typing import Optional, Annotated
 
-from sqlmodel import Field, SQLModel, create_engine, Session, select
+from sqlmodel import Field, SQLModel, create_engine, Session, select , func
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .. import models
 from .. import security
 
+import math
+
 router = APIRouter(prefix="/items", tags=["item"])
+
+SIZE_PER_PAGE = 50
 
 @router.post("")
 async def create_item(
@@ -28,12 +32,25 @@ async def create_item(
 @router.get("")
 async def read_items(
     session: Annotated[AsyncSession, Depends(models.get_session)],
+    page: int = 1,
+    size_per_page: int = SIZE_PER_PAGE,
 ) -> models.ItemList:
-    result = await session.exec(select(models.DBItem))
+    result = await session.exec(
+         select(models.DBItem).offset((page - 1) * size_per_page).limit(size_per_page)
+    )
     items = result.all()
 
+    page_count = int(
+        math.ceil(
+            (await session.exec(select(func.count(models.DBItem.id)))).first()
+            / size_per_page
+        )
+    )
+
+    print("page_count", page_count)
+    print("items", items)
     return models.ItemList.from_orm(
-        dict(items=items, page_size=0, page=0, size_per_page=0)
+        dict(items=items,  page_count=page_count, page=page, size_per_page=size_per_page)
     )
 
 

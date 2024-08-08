@@ -31,6 +31,8 @@ class DBTransaction(Transaction, SQLModel, table=True):
 
     item_id: int = Field(default=None, foreign_key="items.id")
 
+    user_id: int = Field(default=None, foreign_key="users.id")
+
 class TransactionList(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

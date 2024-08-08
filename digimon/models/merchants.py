@@ -14,6 +14,7 @@ class BaseMerchant(BaseModel):
     telephone: str | None = None
     email: str | None = None
     tax_id: str | None = None
+    user_id: int | None = 0
 
 
 
@@ -31,6 +32,8 @@ class Merchant(BaseMerchant):
 class DBMerchant(Merchant, SQLModel, table=True):
     __tablename__ = "merchants"
     id: Optional[int] = Field(default=None, primary_key=True)
+
+    user_id: int = Field(default=None, foreign_key="users.id")
 
 
 class MerchantList(BaseModel):

@@ -26,3 +26,5 @@ class DBWallet(Wallet, SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
 
     merchant_id: int = Field(default=None, foreign_key="merchants.id")
+
+    user_id: int = Field(default=None, foreign_key="users.id")

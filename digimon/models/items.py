@@ -14,6 +14,7 @@ class BaseItem(BaseModel):
     price: float = 0.12
     tax: float | None = None
     merchant_id: int | None
+    user_id: int | None = 1
 
 
 class CreatedItem(BaseItem):
@@ -33,11 +34,13 @@ class DBItem(Item, SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     merchant_id: int = Field(default=None, foreign_key="merchants.id")
 
+    user_id: int = Field(default=None, foreign_key="users.id")
+
 
 class ItemList(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     items: list[Item]
     page: int
-    page_size: int
+    page_count: int
     size_per_page: int
