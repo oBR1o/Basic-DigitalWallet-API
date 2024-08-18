@@ -25,6 +25,10 @@ class UpdatedUser(BaseUser):
 class User(BaseUser):
     id: int
 
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+
 
 class DBUser(User, SQLModel, table=True):
     __tablename__ = "users"
