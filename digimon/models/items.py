@@ -15,6 +15,7 @@ class BaseItem(BaseModel):
     tax: float | None = None
     merchant_id: int | None
     user_id: int | None = 1
+    quantity: int = 1
 
 
 class CreatedItem(BaseItem):

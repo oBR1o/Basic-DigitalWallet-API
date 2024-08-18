@@ -64,7 +64,7 @@ async def update_wallet(
 
 
 @router.delete("/{wallet_id}")
-async def delete_merchant(
+async def delete_wallet(
     merchant_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
     current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],

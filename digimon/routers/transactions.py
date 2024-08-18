@@ -17,6 +17,7 @@ async def create_transaction(
     transaction: models.CreatedTransaction, 
     wallet_id: int, 
     item_id: int,
+    quantity_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
     current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
     ) -> models.Transaction:
@@ -25,15 +26,19 @@ async def create_transaction(
     db_transaction = models.DBTransaction(**data)
     db_transaction.wallet_id = wallet_id
     db_transaction.item_id = item_id
+    db_transaction.quantity = quantity_id
 
     db_wallet = await session.get(models.DBWallet, wallet_id)
     db_item = await session.get(models.DBItem, item_id)
     if db_wallet is None or db_item is None:
         raise HTTPException(status_code=404, detail="Wallet or Item not found")
         
-    total_price = db_item.price * db_transaction.quantity
+    total_price = db_item.price * quantity_id
     if db_wallet.balance < total_price:
         raise HTTPException(status_code=400, detail="Insufficient balance")
+    
+    db_item.quantity -= quantity_id
+    db_item.sqlmodel_update(db_item.dict())
         
     db_wallet.balance -= total_price
     db_wallet.sqlmodel_update(db_wallet.dict())
