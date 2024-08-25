@@ -135,3 +135,32 @@ async def example_merchant_user1(
     await session.refresh(merchant)
     return merchant
     
+@pytest_asyncio.fixture(name = 'item_user1')
+async def example_item_user1(
+    session: models.AsyncSession, user1: DBUser, merchant_user1: models.DBMerchant
+) -> models.DBItem:
+    name = 'item1'
+
+    query = await session.exec(
+        models.select(models.DBItem)
+        .where(models.DBItem.name == name, models.DBItem.user_id == user1.id)
+        .limit(1)
+    )
+    item = query.one_or_none()
+    if item:
+        return item
+    
+    item = models.DBItem(
+      name=name, 
+      description="Item Description", 
+      price = 0.12,
+      tax = 0.00,
+      user_id = user1.id,
+      merchant_id= merchant_user1.id,
+      quantity= 1,
+    )
+
+    session.add(item)
+    await session.commit()
+    await session.refresh(item)
+    return item

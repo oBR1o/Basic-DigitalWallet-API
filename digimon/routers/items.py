@@ -15,20 +15,23 @@ router = APIRouter(prefix="/items", tags=["item"])
 
 SIZE_PER_PAGE = 50
 
-@router.post("")
+@router.post("/{merchant_id}")
 async def create_item(
     item: models.CreatedItem,
+    merchant_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
     current_user: Annotated[AsyncSession, Depends(deps.get_current_activate_user)],   
 ) -> models.Item | None:
-    data = item.dict()
-    dbitem = models.DBItem(**data)
+    
+    dbitem = models.DBItem.model_validate(item)
+    dbitem.merchant_id = merchant_id
+    dbitem.user = current_user
+
     session.add(dbitem)
     await session.commit()
     await session.refresh(dbitem)
 
-    return models.Item.from_orm(dbitem)
-
+    return models.Item.model_validate(dbitem)
 
 @router.get("")
 async def read_items(

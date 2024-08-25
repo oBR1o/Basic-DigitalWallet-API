@@ -96,22 +96,3 @@ class DBUser(BaseUser, SQLModel, table=True):
     register_date: datetime.datetime = Field(default_factory=datetime.datetime.now)
     updated_date: datetime.datetime = Field(default_factory=datetime.datetime.now)
     last_login_date: datetime.datetime | None = Field(default=None)
-
-    async def has_roles(self, roles):
-        for role in roles:
-            if role in self.roles:
-                return True
-        return False
-
-    async def get_encrypted_password(self, plain_password):
-        return bcrypt.hashpw(
-            plain_password.encode("utf-8"), salt=bcrypt.gensalt()
-        ).decode("utf-8")
-
-    async def set_password(self, plain_password):
-        self.password = await self.get_encrypted_password(plain_password)
-
-    async def verify_password(self, plain_password):
-        return bcrypt.checkpw(
-            plain_password.encode("utf-8"), self.password.encode("utf-8")
-        )
