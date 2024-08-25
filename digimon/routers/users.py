@@ -9,47 +9,60 @@ from sqlmodel import Field, SQLModel, create_engine, Session, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .. import security
+from .. import deps
 
 from .. import models
 
-from ..models.users import User , DBUser, CreatedUser,  UpdatedUser, ChangePassword
+from ..models.users import User , DBUser, CreateUser, ChangedPassword
+
 
 
 router = APIRouter(prefix="/users", tags=["user"])
 
-@router.post("")
+@router.post("/create")
 async def create_user(
-    user: CreatedUser,
+    user: CreateUser,
     password: str,
-    session: Annotated[AsyncSession, Depends(models.get_session)]   
-) -> User | None:
-    data = user.dict()
-    dbuser = DBUser(**data)
-    dbuser.hashed_password = security.get_password_hash(password)
-    session.add(dbuser)
-    await session.commit()
-    await session.refresh(dbuser)
+    session: Annotated[AsyncSession, Depends(models.get_session)],
+) -> User:
+    result = await session.exec(select(DBUser).where(DBUser.username == user.username))
+    data = result.one_or_none()
+    if data:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This username is exists.",
+        )
 
-    return dbuser
+    data = user.dict()
+    db_user = DBUser(**data)
+    db_user.hashed_password = security.get_password_hash(password)
+
+    session.add(db_user)
+    await session.commit()
+    await session.refresh(db_user)
+
+    return db_user
+
+
 
 
 @router.get("/me", response_model=User)
 async def read_users_me(
-    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],):
+    current_user: Annotated[AsyncSession, Depends(deps.get_current_activate_user)],):
     return current_user
 
 
 @router.get("/me/items")
 async def read_own_items(
-    current_user: Annotated[User, Depends(security.get_current_activate_user)],
+    current_user: Annotated[User, Depends(deps.get_current_activate_user)],
 ):
     return [{"item_id": "Foo", "owner": current_user.username}]
 
 @router.put("/{user_id}/change_password")
 async def change_password(
     user_id: int,
-    password_update: ChangePassword,
-    current_user: Annotated[User, Depends(security.get_current_activate_user)],
+    password_update: ChangedPassword,
+    current_user: Annotated[User, Depends(deps.get_current_activate_user)],
     session: Annotated[AsyncSession, Depends(models.get_session)],
 ) -> dict(): # type: ignore
     user = await session.get(DBUser, user_id)

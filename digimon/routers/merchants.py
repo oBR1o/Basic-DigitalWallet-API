@@ -6,7 +6,7 @@ from sqlmodel import Field, SQLModel, create_engine, Session, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .. import security
-
+from .. import deps
 from .. import models
 
 router = APIRouter(prefix="/merchants", tags=["merchant"])
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/merchants", tags=["merchant"])
 async def create_merchant(
     merchant: models.CreatedMerchant,
     session: Annotated[AsyncSession,Depends(models.get_session)],
-    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)], 
+    current_user: Annotated[AsyncSession, Depends(deps.get_current_activate_user)], 
     ) -> models.Merchant:
     print("created_merchant", merchant)
     data = merchant.dict()
@@ -54,7 +54,7 @@ async def update_merchant(
     merchant_id: int, 
     merchant: models.UpdatedMerchant,
     session: Annotated[AsyncSession, Depends(models.get_session)],
-    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
+    current_user: Annotated[AsyncSession, Depends(deps.get_current_activate_user)],
     ) -> models.Merchant:
     print("updated_merchant", merchant)
     data = merchant.dict()
@@ -71,7 +71,7 @@ async def update_merchant(
 async def delete_merchant(
     merchant_id: int,
     session: Annotated[AsyncSession, Depends(models.get_session)],
-    current_user: Annotated[AsyncSession, Depends(security.get_current_activate_user)],
+    current_user: Annotated[AsyncSession, Depends(deps.get_current_activate_user)],
     ) -> dict:
     db_merchant = await session.get(models.DBMerchant, merchant_id)
     await session.delete(db_merchant)
